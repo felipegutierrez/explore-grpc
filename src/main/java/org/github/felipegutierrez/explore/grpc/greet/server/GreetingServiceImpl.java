@@ -1,21 +1,21 @@
 package org.github.felipegutierrez.explore.grpc.greet.server;
 
 import io.grpc.stub.StreamObserver;
-import org.github.felipegutierrez.explore.grpc.greet.GreetRequest;
-import org.github.felipegutierrez.explore.grpc.greet.GreetResponse;
-import org.github.felipegutierrez.explore.grpc.greet.GreetServiceGrpc;
-import org.github.felipegutierrez.explore.grpc.greet.Greeting;
+import org.github.felipegutierrez.explore.grpc.greet.*;
 
 public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
     @Override
     public void greet(GreetRequest request, StreamObserver<GreetResponse> responseObserver) {
         // extract necessary fields
         Greeting greeting = request.getGreeting();
+        Numbers numbers = request.getNumbers();
 
         // create the response
         String result = "Hello " + greeting.getFirstName() + " " + greeting.getLastName() + ". Welcome to gRPC!";
+        String sum = "The sum is: " + (numbers.getFirstTerm() + numbers.getSecondTerm()) + " =)";
         GreetResponse response = GreetResponse.newBuilder()
                 .setResult(result)
+                .setSum(sum)
                 .build();
 
         // send the response

@@ -11,12 +11,19 @@ message Greeting {
   string last_name = 2;
 }
 
+message Numbers {
+  int32 first_term = 1;
+  int32 second_term = 2;
+}
+
 message GreetRequest {
   Greeting greeting = 1;
+  Numbers numbers = 2;
 }
 
 message GreetResponse {
   string result = 1;
+  string sum = 2;
 }
 
 service GreetService {
