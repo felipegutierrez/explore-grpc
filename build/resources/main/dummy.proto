@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "org.github.felipegutierrez.explore.grpc.dummy";
+option java_multiple_files = true;
+option java_outer_classname = "DummyProto";
+option cc_generic_services = true;
+option java_generic_services = true;
+
+service DummyService {
+  rpc DummyHello (DummyMessage) returns (DummyMessage) {}
+}
+
+message DummyMessage {
+  string message = 1;
+}

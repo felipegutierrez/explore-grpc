@@ -1,0 +1,58 @@
+proto/main/java/com/example/dummy/DummyMessageOrBuilder.java
+ com.example.dummy.DummyMessageOrBuilder
+proto/main/grpc/org/github/felipegutierrez/explore/grpc/dummy/DummyServiceGrpc.java
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$1
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceBaseDescriptorSupplier
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceBlockingStub
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceFileDescriptorSupplier
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceFutureStub
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceImplBase
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceMethodDescriptorSupplier
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$DummyServiceStub
+ org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc$MethodHandlers
+proto/main/java/com/example/dummy/DummyProto.java
+ com.example.dummy.DummyProto
+proto/main/java/com/example/dummy/DummyMessage.java
+ com.example.dummy.DummyMessage
+ com.example.dummy.DummyMessage$1
+ com.example.dummy.DummyMessage$Builder
+proto/main/java/com/example/dummy/DummyService.java
+ com.example.dummy.DummyService
+ com.example.dummy.DummyService$1
+ com.example.dummy.DummyService$2
+ com.example.dummy.DummyService$BlockingInterface
+ com.example.dummy.DummyService$BlockingStub
+ com.example.dummy.DummyService$Interface
+ com.example.dummy.DummyService$Stub
+proto/main/java/org/github/felipegutierrez/explore/grpc/dummy/DummyMessage.java
+ org.github.felipegutierrez.explore.grpc.dummy.DummyMessage
+ org.github.felipegutierrez.explore.grpc.dummy.DummyMessage$1
+ org.github.felipegutierrez.explore.grpc.dummy.DummyMessage$Builder
+org/github/felipegutierrez/explore/grpc/dummy/server/DummyServer.java
+ org.github.felipegutierrez.explore.grpc.dummy.server.DummyServer
+proto/main/java/org/github/felipegutierrez/explore/grpc/dummy/DummyService.java
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService$1
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService$2
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService$BlockingInterface
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService$BlockingStub
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService$Interface
+ org.github.felipegutierrez.explore.grpc.dummy.DummyService$Stub
+proto/main/grpc/com/example/dummy/DummyServiceGrpc.java
+ com.example.dummy.DummyServiceGrpc
+ com.example.dummy.DummyServiceGrpc$1
+ com.example.dummy.DummyServiceGrpc$DummyServiceBaseDescriptorSupplier
+ com.example.dummy.DummyServiceGrpc$DummyServiceBlockingStub
+ com.example.dummy.DummyServiceGrpc$DummyServiceFileDescriptorSupplier
+ com.example.dummy.DummyServiceGrpc$DummyServiceFutureStub
+ com.example.dummy.DummyServiceGrpc$DummyServiceImplBase
+ com.example.dummy.DummyServiceGrpc$DummyServiceMethodDescriptorSupplier
+ com.example.dummy.DummyServiceGrpc$DummyServiceStub
+ com.example.dummy.DummyServiceGrpc$MethodHandlers
+proto/main/java/org/github/felipegutierrez/explore/grpc/dummy/DummyMessageOrBuilder.java
+ org.github.felipegutierrez.explore.grpc.dummy.DummyMessageOrBuilder
+proto/main/java/org/github/felipegutierrez/explore/grpc/dummy/DummyProto.java
+ org.github.felipegutierrez.explore.grpc.dummy.DummyProto
+org/github/felipegutierrez/explore/grpc/dummy/client/DummyClient.java
+ org.github.felipegutierrez.explore.grpc.dummy.client.DummyClient
