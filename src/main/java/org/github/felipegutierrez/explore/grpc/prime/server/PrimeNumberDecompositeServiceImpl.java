@@ -1,10 +1,7 @@
 package org.github.felipegutierrez.explore.grpc.prime.server;
 
 import io.grpc.stub.StreamObserver;
-import org.github.felipegutierrez.explore.grpc.prime.PrimeNumberManyTimesResponse;
-import org.github.felipegutierrez.explore.grpc.prime.PrimeNumberRequest;
-import org.github.felipegutierrez.explore.grpc.prime.PrimeNumberServiceGrpc;
-import org.github.felipegutierrez.explore.grpc.prime.SourceNumber;
+import org.github.felipegutierrez.explore.grpc.prime.*;
 
 public class PrimeNumberDecompositeServiceImpl extends PrimeNumberServiceGrpc.PrimeNumberServiceImplBase {
     @Override
@@ -36,5 +33,35 @@ public class PrimeNumberDecompositeServiceImpl extends PrimeNumberServiceGrpc.Pr
             // complete the gRPC call
             responseObserver.onCompleted();
         }
+    }
+
+    @Override
+    public StreamObserver<AverageRequest> longAverage(StreamObserver<AverageResponse> responseObserver) {
+        StreamObserver<AverageRequest> requestObserver = new StreamObserver<AverageRequest>() {
+            int counter = 0;
+            double sum = 0;
+
+            @Override
+            public void onNext(AverageRequest value) {
+                // client sends a message
+                sum += value.getValue();
+                counter++;
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                // client processed all messages
+                AverageResponse response = AverageResponse.newBuilder()
+                        .setResult(sum / counter)
+                        .build();
+                responseObserver.onNext(response);
+            }
+        };
+        return requestObserver;
     }
 }
