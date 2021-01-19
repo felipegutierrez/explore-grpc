@@ -20,6 +20,7 @@ public class PrimeNumberDecompositeClient {
 
         // create the greeting PrimeNumber client (blocking - synchronous)
         PrimeNumberServiceGrpc.PrimeNumberServiceBlockingStub syncClient = PrimeNumberServiceGrpc.newBlockingStub(channel);
+        PrimeNumberServiceGrpc.PrimeNumberServiceFutureStub asyncClient = PrimeNumberServiceGrpc.newFutureStub(channel);
 
         // create the protocol buffer message SourceNumber
         SourceNumber sourceNumber = SourceNumber.newBuilder()
@@ -37,7 +38,7 @@ public class PrimeNumberDecompositeClient {
                     System.out.println(primeNumberResponse.getResult());
                 });
 
-        System.out.println("Shutting down GreetingClient");
+        System.out.println("Shutting down PrimeNumberDecomposite client");
         channel.shutdown();
     }
 }
