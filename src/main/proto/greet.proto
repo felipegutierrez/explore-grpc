@@ -26,7 +26,17 @@ message GreetResponse {
   string sum = 2;
 }
 
+message GreetManyTimesRequest {
+  Greeting greeting = 1;
+}
+
+message GreetManyTimesResponse {
+  string result = 1;
+}
+
 service GreetService {
   // Unary gRPC call
   rpc Greet(GreetRequest) returns (GreetResponse) {};
+  // Server streaming
+  rpc GreetManyTimes(GreetManyTimesRequest) returns (stream GreetManyTimesResponse) {};
 }
