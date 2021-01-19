@@ -1,8 +1,8 @@
 package org.github.felipegutierrez.explore.grpc.dummy.client;
 
-import com.example.dummy.DummyServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.github.felipegutierrez.explore.grpc.dummy.DummyServiceGrpc;
 
 public class DummyClient {
     public static void main(String[] args) {
