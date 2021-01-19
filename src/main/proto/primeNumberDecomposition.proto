@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_package = "org.github.felipegutierrez.explore.grpc.prime";
+option java_multiple_files = true;
+option java_outer_classname = "PrimeNumberDecompositionProto";
+option cc_generic_services = true;
+option java_generic_services = true;
+
+message SourceNumber {
+  int64 value = 1;
+}
+
+message PrimeNumberRequest {
+  SourceNumber sourceNumber = 1;
+}
+
+message PrimeNumberManyTimesResponse {
+  string result = 1;
+}
+
+service PrimeNumberService {
+  // gRPC Server streaming
+  rpc Decomposite(PrimeNumberRequest) returns (stream PrimeNumberManyTimesResponse) {};
+}
