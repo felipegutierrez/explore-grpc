@@ -83,10 +83,17 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
 
             @Override
             public void onError(Throwable t) {
+                // make sure to complete the request by sending it to the client stream
+                responseObserver.onCompleted();
             }
 
             @Override
             public void onCompleted() {
+                // make sure to send the last message when the client stream is done to send data
+                MaximumResponse response = MaximumResponse.newBuilder()
+                        .setResult(maximum)
+                        .build();
+                responseObserver.onNext(response);
                 responseObserver.onCompleted();
             }
         };

@@ -122,17 +122,23 @@ public class CalculatorClient {
 
             @Override
             public void onCompleted() {
+                System.out.println("server is done sending data");
                 latch.countDown();
             }
         });
 
         numbers.forEach(n -> {
+            System.out.println("sending number " + n);
             // create the protocol buffer message Greeting
             MaximumRequest request = MaximumRequest.newBuilder()
                     .setValue(n)
                     .build();
-            System.out.println("sending number " + n);
             requestObserver.onNext(request);
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         });
 
         // we tell the server that the client is done sending data
