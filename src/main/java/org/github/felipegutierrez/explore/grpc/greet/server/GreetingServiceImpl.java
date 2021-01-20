@@ -31,7 +31,7 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
             // extract necessary fields
             Greeting greeting = request.getGreeting();
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 10; i++) {
                 // create the response
                 String result = "Hello " + greeting.getFirstName() + " " + greeting.getLastName() + ". Welcome to gRPC! response number[" + i + "]";
                 GreetManyTimesResponse response = GreetManyTimesResponse.newBuilder()
@@ -40,7 +40,7 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
 
                 // send the response
                 responseObserver.onNext(response);
-                Thread.sleep(1000L);
+                Thread.sleep(500L);
             }
         } catch (InterruptedException ie) {
             ie.printStackTrace();
@@ -73,6 +73,31 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
                         .setResult(state)
                         .build();
                 responseObserver.onNext(response);
+            }
+        };
+        return requestObserver;
+    }
+
+    @Override
+    public StreamObserver<GreetEveryoneRequest> greetEveryone(StreamObserver<GreetEveryoneResponse> responseObserver) {
+        StreamObserver<GreetEveryoneRequest> requestObserver = new StreamObserver<GreetEveryoneRequest>() {
+            @Override
+            public void onNext(GreetEveryoneRequest value) {
+                String result = "Hello " + value.getGreeting().getFirstName() + " " + value.getGreeting().getLastName();
+                GreetEveryoneResponse response = GreetEveryoneResponse.newBuilder()
+                        .setResult(result)
+                        .build();
+                responseObserver.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
             }
         };
         return requestObserver;

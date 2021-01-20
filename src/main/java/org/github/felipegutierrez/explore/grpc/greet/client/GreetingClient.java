@@ -5,20 +5,35 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.greet.*;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class GreetingClient {
+
+    // creating a list of request to send to the server
+    List<Pair<String, String>> people = Arrays.asList(
+            new Pair("Felipe", "Gutierrez"),
+            new Pair("Simone", "Farias"),
+            new Pair("Fabio", "Gutierrez"),
+            new Pair("Daniel", "Gutierrez"),
+            new Pair("John", "Oliver"),
+            new Pair("Michael", "Jordan"),
+            new Pair("Oscar", "Wilde"),
+            new Pair("Madonna", "Monalisa")
+    );
+
     private ManagedChannel channel;
 
     public static void main(String[] args) {
         GreetingClient client = new GreetingClient();
         client.createChannel();
-//        client.runUnaryGrpc();
-//        client.runStreamServerGrpc();
+
+        client.runUnaryGrpc();
+        client.runStreamServerGrpc();
         client.runStreamClientGrpc();
+        client.runStreamBiDirectionalGrpc();
         client.closeChannel();
     }
 
@@ -86,13 +101,8 @@ public class GreetingClient {
 
     private void runStreamClientGrpc() {
         System.out.println("GreetingClient client streaming - Hello gRPC");
-        List<Pair<String, String>> names = new ArrayList<Pair<String, String>>();
-        names.add(new Pair("Felipe", "Gutierrez"));
-        names.add(new Pair("Simone", "Farias"));
-        names.add(new Pair("Fabio", "Gutierrez"));
-        names.add(new Pair("Daniel", "Gutierrez"));
 
-        // create the greeting service client (blocking - synchronous)
+        // create the greeting service client (asynchronous)
         GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(channel);
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -115,20 +125,77 @@ public class GreetingClient {
             }
         });
 
-        int counter = 1;
-        for (Pair<String, String> name : names) {
-            // create the protocol buffer message Greeting
-            Greeting greeting = Greeting.newBuilder()
-                    .setFirstName(name.x)
-                    .setLastName(name.y)
-                    .build();
-            LongGreetRequest request = LongGreetRequest.newBuilder()
-                    .setGreeting(greeting)
-                    .build();
-            System.out.println("sending message " + counter);
-            requestObserver.onNext(request);
-            counter++;
+        people.forEach(person -> {
+                    // create the protocol buffer message Greeting
+                    Greeting greeting = Greeting.newBuilder()
+                            .setFirstName(person.x)
+                            .setLastName(person.y)
+                            .build();
+                    LongGreetRequest request = LongGreetRequest.newBuilder()
+                            .setGreeting(greeting)
+                            .build();
+                    System.out.println("sending message: " + person);
+                    requestObserver.onNext(request);
+                    try {
+                        // simulate some computation to check asynchronous behaviour
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+
+        // we tell the server that the client is done sending data
+        requestObserver.onCompleted();
+
+        try {
+            latch.await(3L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void runStreamBiDirectionalGrpc() {
+        // create the greeting service client (asynchronous)
+        GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(channel);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<GreetEveryoneRequest> requestObserver = asyncClient.greetEveryone(new StreamObserver<GreetEveryoneResponse>() {
+            @Override
+            public void onNext(GreetEveryoneResponse value) {
+                System.out.println("received response from server: " + value.getResult());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+
+        people.forEach(person -> {
+                    // create the protocol buffer message Greeting
+                    Greeting greeting = Greeting.newBuilder()
+                            .setFirstName(person.x)
+                            .setLastName(person.y)
+                            .build();
+                    GreetEveryoneRequest request = GreetEveryoneRequest.newBuilder()
+                            .setGreeting(greeting)
+                            .build();
+                    System.out.println("sending message: " + person);
+                    requestObserver.onNext(request);
+                    try {
+                        // simulate some computation to check asynchronous behaviour
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
 
         // we tell the server that the client is done sending data
         requestObserver.onCompleted();
@@ -148,5 +215,13 @@ class Pair<S, T> {
     public Pair(S x, T y) {
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public String toString() {
+        return "Pair{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 }
