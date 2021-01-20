@@ -1,21 +1,21 @@
-package org.github.felipegutierrez.explore.grpc.prime.server;
+package org.github.felipegutierrez.explore.grpc.calculator.server;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
 import java.io.IOException;
 
-public class PrimeNumberDecompositeServer {
+public class CalculatorServer {
     public static void main(String[] args) {
-        PrimeNumberDecompositeServer server = new PrimeNumberDecompositeServer();
+        CalculatorServer server = new CalculatorServer();
         server.run();
     }
 
     public void run() {
         try {
-            System.out.println("PrimeNumberDecomposite server - Hello gRPC");
+            System.out.println("Calculator server - Hello gRPC");
             Server server = ServerBuilder.forPort(50051)
-                    .addService(new PrimeNumberDecompositeServiceImpl())
+                    .addService(new CalculatorServiceImpl())
                     .build();
 
             server.start();

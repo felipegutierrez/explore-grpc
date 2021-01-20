@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option java_package = "org.github.felipegutierrez.explore.grpc.prime";
+option java_package = "org.github.felipegutierrez.explore.grpc.calculator";
 option java_multiple_files = true;
-option java_outer_classname = "PrimeNumberDecompositionProto";
+option java_outer_classname = "CalculatorProto";
 option cc_generic_services = true;
 option java_generic_services = true;
 
@@ -30,7 +30,7 @@ message MaximumResponse {
   int32 result = 1;
 }
 
-service PrimeNumberService {
+service CalculatorService {
   // gRPC Server streaming
   rpc Decomposite(PrimeNumberRequest) returns (stream PrimeNumberManyTimesResponse) {};
   // gRPC Client streaming

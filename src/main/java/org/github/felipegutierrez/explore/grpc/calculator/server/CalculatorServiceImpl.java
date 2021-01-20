@@ -1,11 +1,9 @@
-package org.github.felipegutierrez.explore.grpc.prime.server;
+package org.github.felipegutierrez.explore.grpc.calculator.server;
 
 import io.grpc.stub.StreamObserver;
-import org.github.felipegutierrez.explore.grpc.greet.GreetEveryoneRequest;
-import org.github.felipegutierrez.explore.grpc.greet.GreetEveryoneResponse;
-import org.github.felipegutierrez.explore.grpc.prime.*;
+import org.github.felipegutierrez.explore.grpc.calculator.*;
 
-public class PrimeNumberDecompositeServiceImpl extends PrimeNumberServiceGrpc.PrimeNumberServiceImplBase {
+public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServiceImplBase {
     @Override
     public void decomposite(PrimeNumberRequest request, StreamObserver<PrimeNumberManyTimesResponse> responseObserver) {
         try {

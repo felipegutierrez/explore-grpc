@@ -1,21 +1,21 @@
-package org.github.felipegutierrez.explore.grpc.prime.client;
+package org.github.felipegutierrez.explore.grpc.calculator.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import org.github.felipegutierrez.explore.grpc.prime.*;
+import org.github.felipegutierrez.explore.grpc.calculator.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class PrimeNumberDecompositeClient {
+public class CalculatorClient {
     List<Integer> numbers = Arrays.asList(1, 20, 2, 30, 3, 40, 4, 50, 5);
     private ManagedChannel channel;
 
     public static void main(String[] args) {
-        PrimeNumberDecompositeClient client = new PrimeNumberDecompositeClient();
+        CalculatorClient client = new CalculatorClient();
         client.createChannel();
 
         client.runStreamServerGrpc();
@@ -26,20 +26,20 @@ public class PrimeNumberDecompositeClient {
     }
 
     private void createChannel() {
-        System.out.println("PrimeNumberDecomposite client - Hello gRPC");
+        System.out.println("Calculator client - Hello gRPC");
         channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
     }
 
     private void closeChannel() {
-        System.out.println("Shutting down PrimeNumberDecomposite client");
+        System.out.println("Shutting down Calculator client");
         channel.shutdown();
     }
 
     private void runStreamServerGrpc() {
         // create the greeting PrimeNumber client (blocking - synchronous)
-        PrimeNumberServiceGrpc.PrimeNumberServiceBlockingStub syncClient = PrimeNumberServiceGrpc.newBlockingStub(channel);
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub syncClient = CalculatorServiceGrpc.newBlockingStub(channel);
 
         // create the protocol buffer message SourceNumber
         SourceNumber sourceNumber = SourceNumber.newBuilder()
@@ -62,7 +62,7 @@ public class PrimeNumberDecompositeClient {
         System.out.println("Average client streaming - Hello gRPC");
 
         // create the greeting service client (asynchronous)
-        PrimeNumberServiceGrpc.PrimeNumberServiceStub asyncClient = PrimeNumberServiceGrpc.newStub(channel);
+        CalculatorServiceGrpc.CalculatorServiceStub asyncClient = CalculatorServiceGrpc.newStub(channel);
         CountDownLatch latch = new CountDownLatch(1);
 
         StreamObserver<AverageRequest> requestObserver = asyncClient.longAverage(new StreamObserver<AverageResponse>() {
@@ -105,7 +105,7 @@ public class PrimeNumberDecompositeClient {
 
     private void runStreamBiDirectionalGrpc() {
         // create the greeting service client (asynchronous)
-        PrimeNumberServiceGrpc.PrimeNumberServiceStub asyncClient = PrimeNumberServiceGrpc.newStub(channel);
+        CalculatorServiceGrpc.CalculatorServiceStub asyncClient = CalculatorServiceGrpc.newStub(channel);
         CountDownLatch latch = new CountDownLatch(1);
 
         StreamObserver<MaximumRequest> requestObserver = asyncClient.findMaximum(new StreamObserver<MaximumResponse>() {
