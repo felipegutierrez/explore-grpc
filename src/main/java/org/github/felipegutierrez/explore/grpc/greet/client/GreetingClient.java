@@ -1,7 +1,6 @@
 package org.github.felipegutierrez.explore.grpc.greet.client;
 
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.greet.*;
 
@@ -34,6 +33,8 @@ public class GreetingClient {
         client.runStreamServerGrpc();
         client.runStreamClientGrpc();
         client.runStreamBiDirectionalGrpc();
+        client.runUnaryWithDeadlineGrpc();
+
         client.closeChannel();
     }
 
@@ -205,6 +206,37 @@ public class GreetingClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void runUnaryWithDeadlineGrpc() {
+        // create the greeting service client (blocking - synchronous)
+        GreetServiceGrpc.GreetServiceBlockingStub syncClient = GreetServiceGrpc.newBlockingStub(channel);
+
+        people.forEach(person -> {
+            // create the protocol buffer message Greeting
+            Greeting greeting = Greeting.newBuilder()
+                    .setFirstName(person.x)
+                    .setLastName(person.y)
+                    .build();
+            // create a greeting request with the protocol buffer greeting message
+            GreetWithDeadlineRequest request = GreetWithDeadlineRequest.newBuilder()
+                    .setGreeting(greeting)
+                    .build();
+            try {
+                System.out.println("Sending message: " + greeting.toString());
+                // call the gRPC and get back a protocol buffer GreetingResponse
+                GreetWithDeadlineResponse greetResponse = syncClient
+                        .withDeadline(Deadline.after(300, TimeUnit.MILLISECONDS))
+                        .greetWithDeadline(request);
+                System.out.println("Hello from server with deadline: " + greetResponse.getResult());
+            } catch (StatusRuntimeException e) {
+                if (e.getStatus().getCode() == Status.Code.DEADLINE_EXCEEDED) {
+                    System.err.println("Deadline exceeded for " + greeting.toString() + ", we by pass the answer.");
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
 

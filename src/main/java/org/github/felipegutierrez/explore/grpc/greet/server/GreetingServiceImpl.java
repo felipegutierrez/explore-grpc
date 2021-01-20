@@ -1,7 +1,10 @@
 package org.github.felipegutierrez.explore.grpc.greet.server;
 
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.greet.*;
+
+import java.util.Random;
 
 public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
     @Override
@@ -101,5 +104,33 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
             }
         };
         return requestObserver;
+    }
+
+    @Override
+    public void greetWithDeadline(GreetWithDeadlineRequest request, StreamObserver<GreetWithDeadlineResponse> responseObserver) {
+        try {
+            Context context = Context.current();
+
+            Random random = new Random();
+            long time = (random.nextInt(5)) * 100;
+            System.out.println("taking " + time + " milliseconds to process...");
+            Thread.sleep(time);
+
+            // if the time reaches the upper bound dead line we return the gRPC call
+            if (context.isCancelled()) {
+                System.out.println("context.isCancelled()");
+                return;
+            }
+
+            String result = "Hello " + request.getGreeting().getFirstName() + " " + request.getGreeting().getLastName() + " after " + time + " milliseconds.";
+            GreetWithDeadlineResponse response = GreetWithDeadlineResponse.newBuilder()
+                    .setResult(result)
+                    .build();
+            responseObserver.onNext(response);
+            // dont forget to complete the call and send message back to the client!!!
+            responseObserver.onCompleted();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
