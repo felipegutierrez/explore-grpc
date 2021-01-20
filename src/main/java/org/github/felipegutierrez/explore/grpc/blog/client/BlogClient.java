@@ -2,6 +2,10 @@ package org.github.felipegutierrez.explore.grpc.blog.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.github.felipegutierrez.explore.grpc.blog.Blog;
+import org.github.felipegutierrez.explore.grpc.blog.BlogServiceGrpc;
+import org.github.felipegutierrez.explore.grpc.blog.CreateBlogRequest;
+import org.github.felipegutierrez.explore.grpc.blog.CreateBlogResponse;
 
 public class BlogClient {
 
@@ -11,7 +15,7 @@ public class BlogClient {
         BlogClient client = new BlogClient();
 
         client.createChannel();
-        // client.runUnaryGrpc();
+        client.createBlog();
         client.closeChannel();
     }
 
@@ -25,5 +29,20 @@ public class BlogClient {
     private void closeChannel() {
         System.out.println("Shutting down BlogClient");
         channel.shutdown();
+    }
+
+    private void createBlog() {
+        BlogServiceGrpc.BlogServiceBlockingStub syncBlogClient = BlogServiceGrpc.newBlockingStub(channel);
+        Blog blog = Blog.newBuilder()
+                .setAuthorId("Felipe")
+                .setTitle("Blog title =)")
+                .setContent("hello this is my new blog")
+                .build();
+        CreateBlogRequest blogRequest = CreateBlogRequest.newBuilder()
+                .setBlog(blog)
+                .build();
+
+        CreateBlogResponse blogResponse = syncBlogClient.createBlog(blogRequest);
+        System.out.println("received create blog response: " + blogResponse.toString());
     }
 }

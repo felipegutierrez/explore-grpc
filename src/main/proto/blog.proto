@@ -22,5 +22,5 @@ message CreateBlogResponse {
 }
 
 service BlogService {
-
+  rpc CreateBlog(CreateBlogRequest) returns (CreateBlogResponse){};
 }
