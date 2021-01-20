@@ -2,6 +2,7 @@ package org.github.felipegutierrez.explore.grpc.calculator.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.calculator.*;
 
@@ -11,16 +12,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class CalculatorClient {
-    List<Integer> numbers = Arrays.asList(1, 20, 2, 30, 3, 40, 4, 50, 5);
+    List<Integer> numbers = Arrays.asList(1, -9, 20, 2, -10, 30, -49, 3, 40, 4, 50, 5);
     private ManagedChannel channel;
 
     public static void main(String[] args) {
         CalculatorClient client = new CalculatorClient();
         client.createChannel();
 
-        client.runStreamServerGrpc();
+        client.runSyncServerGrpc();
         client.runStreamClientGrpc();
         client.runStreamBiDirectionalGrpc();
+        client.runSyncSquareRootGrpc();
 
         client.closeChannel();
     }
@@ -37,7 +39,7 @@ public class CalculatorClient {
         channel.shutdown();
     }
 
-    private void runStreamServerGrpc() {
+    private void runSyncServerGrpc() {
         // create the greeting PrimeNumber client (blocking - synchronous)
         CalculatorServiceGrpc.CalculatorServiceBlockingStub syncClient = CalculatorServiceGrpc.newBlockingStub(channel);
 
@@ -149,5 +151,24 @@ public class CalculatorClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void runSyncSquareRootGrpc() {
+        // create the greeting PrimeNumber client (blocking - synchronous)
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub syncClient = CalculatorServiceGrpc.newBlockingStub(channel);
+
+        numbers.forEach(n -> {
+            try {
+                System.out.println("sending number " + n);
+                SquareRootRequest request = SquareRootRequest.newBuilder()
+                        .setNumber(n)
+                        .build();
+                double numberRoot = syncClient.squareRoot(request).getNumberRoot();
+                System.out.println("The root of " + n + " is: " + numberRoot);
+            } catch (StatusRuntimeException e) {
+                System.err.println("Got a runtime exception from square root.");
+                e.printStackTrace();
+            }
+        });
     }
 }

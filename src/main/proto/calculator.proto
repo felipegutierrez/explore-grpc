@@ -30,6 +30,13 @@ message MaximumResponse {
   int32 result = 1;
 }
 
+message SquareRootRequest {
+  int32 number = 1;
+}
+message SquareRootResponse {
+  double number_root = 1;
+}
+
 service CalculatorService {
   // gRPC Server streaming
   rpc Decomposite(PrimeNumberRequest) returns (stream PrimeNumberManyTimesResponse) {};
@@ -37,4 +44,6 @@ service CalculatorService {
   rpc LongAverage(stream AverageRequest) returns (AverageResponse) {};
   // gRPC BiDirectional streaming
   rpc FindMaximum(stream MaximumRequest) returns (stream MaximumResponse) {};
+  // Error handling. This unary rpc will throw an error if number is negative
+  rpc SquareRoot(SquareRootRequest) returns (SquareRootResponse) {};
 }

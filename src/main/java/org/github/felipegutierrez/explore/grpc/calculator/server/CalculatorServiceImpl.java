@@ -1,5 +1,6 @@
 package org.github.felipegutierrez.explore.grpc.calculator.server;
 
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.calculator.*;
 
@@ -98,5 +99,24 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
             }
         };
         return requestObserver;
+    }
+
+    @Override
+    public void squareRoot(SquareRootRequest request, StreamObserver<SquareRootResponse> responseObserver) {
+        Integer number = request.getNumber();
+        if (number >= 0) {
+            double numberRoot = Math.sqrt(number);
+            SquareRootResponse response = SquareRootResponse.newBuilder()
+                    .setNumberRoot(numberRoot)
+                    .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } else {
+            responseObserver.onError(Status.INVALID_ARGUMENT
+                    .withDescription("Negative numbers are not allowed.")
+                    .augmentDescription("The number sent is: " + number)
+                    .asRuntimeException()
+            );
+        }
     }
 }
