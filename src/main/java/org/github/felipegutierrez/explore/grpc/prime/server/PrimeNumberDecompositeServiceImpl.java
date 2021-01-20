@@ -1,6 +1,8 @@
 package org.github.felipegutierrez.explore.grpc.prime.server;
 
 import io.grpc.stub.StreamObserver;
+import org.github.felipegutierrez.explore.grpc.greet.GreetEveryoneRequest;
+import org.github.felipegutierrez.explore.grpc.greet.GreetEveryoneResponse;
 import org.github.felipegutierrez.explore.grpc.prime.*;
 
 public class PrimeNumberDecompositeServiceImpl extends PrimeNumberServiceGrpc.PrimeNumberServiceImplBase {
@@ -60,6 +62,34 @@ public class PrimeNumberDecompositeServiceImpl extends PrimeNumberServiceGrpc.Pr
                         .setResult(sum / counter)
                         .build();
                 responseObserver.onNext(response);
+            }
+        };
+        return requestObserver;
+    }
+
+    @Override
+    public StreamObserver<MaximumRequest> findMaximum(StreamObserver<MaximumResponse> responseObserver) {
+        StreamObserver<MaximumRequest> requestObserver = new StreamObserver<MaximumRequest>() {
+            int maximum = 0;
+
+            @Override
+            public void onNext(MaximumRequest value) {
+                if (value.getValue() > maximum) {
+                    maximum = value.getValue();
+                }
+                MaximumResponse response = MaximumResponse.newBuilder()
+                        .setResult(maximum)
+                        .build();
+                responseObserver.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
             }
         };
         return requestObserver;
