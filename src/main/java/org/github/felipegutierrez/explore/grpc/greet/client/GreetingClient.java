@@ -27,14 +27,13 @@ public class GreetingClient {
 
     public static void main(String[] args) {
         GreetingClient client = new GreetingClient();
-        client.createChannel();
 
+        client.createChannel();
         client.runUnaryGrpc();
         client.runStreamServerGrpc();
         client.runStreamClientGrpc();
         client.runStreamBiDirectionalGrpc();
         client.runUnaryWithDeadlineGrpc();
-
         client.closeChannel();
     }
 

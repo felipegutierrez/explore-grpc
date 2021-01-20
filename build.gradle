@@ -28,6 +28,7 @@ protobuf {
 }
 
 dependencies {
+    // implementation 'io.grpc:grpc-netty:1.24.0' // only grpc-netty-shaded includes SSL libraries for gRPC
     implementation 'io.grpc:grpc-netty-shaded:1.24.0'
     implementation 'io.grpc:grpc-protobuf:1.24.0'
     implementation 'io.grpc:grpc-stub:1.24.0'
