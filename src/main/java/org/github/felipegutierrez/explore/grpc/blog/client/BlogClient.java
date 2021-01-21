@@ -17,6 +17,8 @@ public class BlogClient {
         client.readBlog(blogId);
         client.readBlog("6008690d9ffc137a3ca8f22a");
         client.updateBlog(blogId, "Felipe Oliveira Gutierrez", "Blog new title updated ;)", "hello this is my new blog and I have updated it.");
+        client.deleteBlog(blogId);
+        client.deleteBlog("6008690d9ffc137a3ca8f22a");
         client.closeChannel();
     }
 
@@ -88,6 +90,22 @@ public class BlogClient {
             UpdateBlogResponse blogResponse = syncBlogClient.updateBlog(blogRequest);
 
             System.out.println("received the blog update response: " + blogResponse.toString());
+        } catch (StatusRuntimeException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteBlog(String blogId) {
+        try {
+            System.out.println("deleting blog: " + blogId);
+            BlogServiceGrpc.BlogServiceBlockingStub syncBlogClient = BlogServiceGrpc.newBlockingStub(channel);
+
+            DeleteBlogRequest blogRequest = DeleteBlogRequest.newBuilder()
+                    .setBlogId(blogId)
+                    .build();
+
+            DeleteBlogResponse blogResponse = syncBlogClient.deleteBlog(blogRequest);
+            System.out.println("delete blog response: " + blogResponse.toString());
         } catch (StatusRuntimeException e) {
             e.printStackTrace();
         }

@@ -115,6 +115,38 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
         }
     }
 
+    @Override
+    public void deleteBlog(DeleteBlogRequest request, StreamObserver<DeleteBlogResponse> responseObserver) {
+        System.out.println("received delete blog request");
+        String blogId = request.getBlogId();
+
+        System.out.println("searching blog request");
+        Long result = null;
+        try {
+            result = collection.deleteOne(eq("_id", new ObjectId(blogId))).getDeletedCount();
+
+            if (result == null || result == 0L) {
+                System.out.println("blog not found");
+                responseObserver.onError(Status.NOT_FOUND
+                        .withDescription("The blog with id " + blogId + " was not found.")
+                        .asRuntimeException());
+            } else {
+                System.out.println("blog deleted");
+                responseObserver.onNext(DeleteBlogResponse
+                        .newBuilder()
+                        .setBlogId(blogId)
+                        .build()
+                );
+                responseObserver.onCompleted();
+            }
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("The delete blog with id " + blogId + " was aborted.")
+                    .augmentDescription(e.getLocalizedMessage())
+                    .asRuntimeException());
+        }
+    }
+
     private Blog documentToBlog(Document document) {
         return Blog.newBuilder()
                 .setAuthorId(document.getString("author_id"))
