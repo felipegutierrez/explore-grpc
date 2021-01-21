@@ -59,20 +59,68 @@ public class BlogServiceImpl extends BlogServiceGrpc.BlogServiceImplBase {
                         .asRuntimeException());
             } else {
                 System.out.println("blog found");
-                Blog blog = Blog.newBuilder()
-                        .setAuthorId(result.getString("author_id"))
-                        .setTitle(result.getString("title"))
-                        .setContent(result.getString("content"))
-                        .setId(blogId)
-                        .build();
-                responseObserver.onNext(ReadBlogResponse.newBuilder().setBlog(blog).build());
+                responseObserver.onNext(ReadBlogResponse
+                        .newBuilder()
+                        .setBlog(documentToBlog(result))
+                        .build()
+                );
                 responseObserver.onCompleted();
             }
         } catch (Exception e) {
-            responseObserver.onError(Status.NOT_FOUND
-                    .withDescription("The blog with id " + blogId + " was not found.")
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("The read blog with id " + blogId + " was aborted.")
                     .augmentDescription(e.getLocalizedMessage())
                     .asRuntimeException());
         }
+    }
+
+    @Override
+    public void updateBlog(UpdateBlogRequest request, StreamObserver<UpdateBlogResponse> responseObserver) {
+        System.out.println("received update blog request");
+        Blog newBlog = request.getBlog();
+        String blogId = newBlog.getId();
+
+        System.out.println("searching blog request");
+        Document result = null;
+        try {
+            result = collection.find(eq("_id", new ObjectId(blogId))).first();
+            if (result == null) {
+                System.out.println("blog not found");
+                responseObserver.onError(Status.NOT_FOUND
+                        .withDescription("The blog with id " + blogId + " was not found.")
+                        .asRuntimeException());
+            } else {
+                System.out.println("blog found");
+                Document replacement = new Document("author_id", newBlog.getAuthorId())
+                        .append("title", newBlog.getTitle())
+                        .append("content", newBlog.getContent())
+                        .append("_id", new ObjectId(blogId));
+
+                System.out.println("Replacing blog in database...");
+                collection.replaceOne(eq("_id", result.getObjectId("_id")), replacement);
+
+                System.out.println("Replaced! Sending as a response");
+                responseObserver.onNext(UpdateBlogResponse
+                        .newBuilder()
+                        .setBlog(documentToBlog(replacement))
+                        .build()
+                );
+                responseObserver.onCompleted();
+            }
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL
+                    .withDescription("The read blog with id " + blogId + " was aborted.")
+                    .augmentDescription(e.getLocalizedMessage())
+                    .asRuntimeException());
+        }
+    }
+
+    private Blog documentToBlog(Document document) {
+        return Blog.newBuilder()
+                .setAuthorId(document.getString("author_id"))
+                .setTitle(document.getString("title"))
+                .setContent(document.getString("content"))
+                .setId(document.getObjectId("_id").toString())
+                .build();
     }
 }
