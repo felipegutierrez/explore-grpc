@@ -21,7 +21,7 @@ public class ChatClientAlice {
     public static void main(String[] args) {
         ChatClientAlice chatClientAlice = new ChatClientAlice();
         chatClientAlice.createChannel();
-        chatClientAlice.runUnaryChat();
+        // chatClientAlice.runUnaryChat();
         chatClientAlice.runBiDiStreamChat();
         chatClientAlice.closeChannel();
     }
@@ -53,11 +53,11 @@ public class ChatClientAlice {
                 .limit(5)
                 .forEach(integer -> {
                     String msg = "Hello, I am " + ChatClientAlice.class.getSimpleName() + "! I am sending message number " + integer + ".";
-                    System.out.println("Alice sending unary message: " + msg);
+                    System.out.println("Alice says: " + msg);
                     EchoResponse response = stub.echoUnary(EchoRequest.newBuilder()
                             .setMessage(msg)
                             .build());
-                    System.out.println("Alice receiving unary message: " + response.getMessage());
+                    System.out.println("chat: " + response.getMessage());
 
                     // throttle the stream
                     try {
@@ -77,7 +77,7 @@ public class ChatClientAlice {
         StreamObserver<EchoRequest> requestObserver = asyncClient.echoBiDi(new StreamObserver<EchoResponse>() {
             @Override
             public void onNext(EchoResponse value) {
-                System.out.println("Alice received response from server: " + value.getMessage());
+                System.out.println("chat: " + value.getMessage());
             }
 
             @Override
@@ -95,7 +95,7 @@ public class ChatClientAlice {
                 .limit(10)
                 .forEach(integer -> {
                     String msg = "Hello, I am " + ChatClientAlice.class.getSimpleName() + "! I am sending stream message number " + integer + ".";
-                    System.out.println("Alice sending message: " + msg);
+                    System.out.println("Alice says: " + msg);
                     EchoRequest request = EchoRequest.newBuilder()
                             .setMessage(msg)
                             .build();

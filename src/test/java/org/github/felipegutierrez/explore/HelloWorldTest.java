@@ -1,18 +1,12 @@
 package org.github.felipegutierrez.explore;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class HelloWorldTest {
 
-    private HelloWorld subject;
-
-    @Before
-    public void setup() {
-        subject = new HelloWorld();
-    }
+    private final HelloWorld subject = new HelloWorld();
 
     @Test
     public void testGetMessage() {
