@@ -8,17 +8,23 @@ plugins {
 group 'org.github.felipegutierrez.explore.grpc'
 version '1.0'
 
+def grpc_version = "1.24.0"
+def mongodb_version = "4.1.1"
+def junit_version = "4.13"
+def junit_jupiter_version = "5.6.0"
+def protobuf_version = "3.10.0"
+
 repositories {
     mavenCentral()
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.10.0"
+        artifact = "com.google.protobuf:protoc:$protobuf_version"
     }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.24.0'
+            artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version"
         }
     }
     generateProtoTasks {
@@ -29,21 +35,31 @@ protobuf {
 }
 
 dependencies {
-    // implementation 'io.grpc:grpc-netty:1.24.0' // only grpc-netty-shaded includes SSL libraries for gRPC
-    implementation 'io.grpc:grpc-netty-shaded:1.24.0'
-    implementation 'io.grpc:grpc-protobuf:1.24.0'
-    implementation 'io.grpc:grpc-stub:1.24.0'
-    implementation "io.grpc:grpc-services:1.24.0"   // reflection
+    // gRPC
+    // implementation "io.grpc:grpc-netty:$grpc_version" // only grpc-netty-shaded includes SSL libraries for gRPC
+    implementation "io.grpc:grpc-netty-shaded:$grpc_version"
+    implementation "io.grpc:grpc-protobuf:$grpc_version"
+    implementation "io.grpc:grpc-stub:$grpc_version"
+    implementation "io.grpc:grpc-services:$grpc_version" // reflection
 
-    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.1.1'
+    // mongodb
+    compile "org.mongodb:mongodb-driver-sync:$mongodb_version"
 
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    // Unit tests
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine"
+    testImplementation "io.grpc:grpc-testing:$grpc_version"
 }
 
 test {
-    useJUnitPlatform()
+    useJUnit()
+    useJUnitPlatform {
+        includeEngines 'junit-vintage'
+        // excludeEngines 'junit-jupiter'
+    }
+    maxHeapSize = '1G'
 }
 
 jacocoTestReport {
