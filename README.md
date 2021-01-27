@@ -1,6 +1,8 @@
 
 [![Build Status](https://www.travis-ci.com/felipegutierrez/explore-grpc.svg?branch=main)](https://www.travis-ci.com/felipegutierrez/explore-grpc)
 [![codecov](https://codecov.io/gh/felipegutierrez/explore-grpc/branch/main/graph/badge.svg?token=49Y55XPCCT)](https://codecov.io/gh/felipegutierrez/explore-grpc)
+![GitHub issues](https://img.shields.io/github/issues-raw/felipegutierrez/explore-grpc)
+![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/felipegutierrez/explore-grpc)
 
 # Exploring gRPC using Java
 
