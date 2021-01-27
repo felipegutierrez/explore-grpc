@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "org.github.felipegutierrez.explore.grpc.chat";
+option java_multiple_files = true;
+option java_outer_classname = "ChatProto";
+option cc_generic_services = true;
+option java_generic_services = true;
+
+message EchoRequest {
+  string message = 1;
+}
+
+message EchoResponse {
+  string message = 1;
+}
+
+service EchoService {
+  rpc echo (EchoRequest) returns (EchoResponse);
+}
