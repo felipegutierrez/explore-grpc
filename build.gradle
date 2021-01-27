@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'com.google.protobuf' version '0.8.10'
     id 'idea'
+    id 'jacoco'
 }
 
 group 'org.github.felipegutierrez.explore.grpc'
@@ -36,12 +37,20 @@ dependencies {
 
     compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.1.1'
 
+    testCompile group: 'junit', name: 'junit', version: '4.11'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
 }
 
 // if you have source imports issues, add the below
@@ -52,3 +61,20 @@ idea {
         generatedSourceDirs += file('build/generated/source')
     }
 }
+
+task codeCoverageReport(type: JacocoReport) {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
+        html.enabled false
+        csv.enabled false
+    }
+}
+
+check.dependsOn jacocoTestReport
