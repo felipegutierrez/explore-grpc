@@ -14,7 +14,7 @@ public class ChatServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
     }
 
     @Override
-    public void echo(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
+    public void echoUnary(EchoRequest request, StreamObserver<EchoResponse> responseObserver) {
         String message = request.getMessage();
         String reply = this.name + " echo: " + message;
         EchoResponse response = EchoResponse.newBuilder()
@@ -22,5 +22,31 @@ public class ChatServiceImpl extends EchoServiceGrpc.EchoServiceImplBase {
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public StreamObserver<EchoRequest> echoBiDi(StreamObserver<EchoResponse> responseObserver) {
+        StreamObserver<EchoRequest> requestObserver = new StreamObserver<EchoRequest>() {
+            @Override
+            public void onNext(EchoRequest value) {
+                String msg = value.getMessage();
+                System.out.println("received message: " + msg);
+                EchoResponse response = EchoResponse.newBuilder()
+                        .setMessage(msg)
+                        .build();
+                responseObserver.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
+            }
+        };
+        return requestObserver;
     }
 }

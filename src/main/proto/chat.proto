@@ -15,5 +15,6 @@ message EchoResponse {
 }
 
 service EchoService {
-  rpc echo (EchoRequest) returns (EchoResponse);
+  rpc echoUnary(EchoRequest) returns (EchoResponse);
+  rpc echoBiDi(stream EchoRequest) returns (stream EchoResponse);
 }
