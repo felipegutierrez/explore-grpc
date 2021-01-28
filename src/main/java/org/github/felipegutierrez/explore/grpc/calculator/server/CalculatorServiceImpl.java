@@ -61,6 +61,8 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
                         .setResult(sum / counter)
                         .build();
                 responseObserver.onNext(response);
+                // complete the gRPC call
+                responseObserver.onCompleted();
             }
         };
         return requestObserver;
