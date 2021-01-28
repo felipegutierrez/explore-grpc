@@ -3,6 +3,7 @@ package org.github.felipegutierrez.explore.grpc.greet.client;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.greet.*;
+import org.github.felipegutierrez.explore.grpc.util.Pair;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,11 +30,11 @@ public class GreetingClient {
         GreetingClient client = new GreetingClient();
 
         client.createChannel();
-        client.runUnaryGrpc();
-        client.runStreamServerGrpc();
+        // client.runUnaryGrpc();
+        // client.runStreamServerGrpc();
         client.runStreamClientGrpc();
-        client.runStreamBiDirectionalGrpc();
-        client.runUnaryWithDeadlineGrpc();
+        // client.runStreamBiDirectionalGrpc();
+        // client.runUnaryWithDeadlineGrpc();
         client.closeChannel();
     }
 
@@ -89,6 +90,7 @@ public class GreetingClient {
         // create a greeting request with the protocol buffer greeting message
         GreetManyTimesRequest request = GreetManyTimesRequest.newBuilder()
                 .setGreeting(greeting)
+                .setTimes(10)
                 .build();
 
         // call the gRPC and get back a protocol buffer GreetingResponse
@@ -236,23 +238,5 @@ public class GreetingClient {
                 }
             }
         });
-    }
-}
-
-class Pair<S, T> {
-    public final S x;
-    public final T y;
-
-    public Pair(S x, T y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public String toString() {
-        return "Pair{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
     }
 }

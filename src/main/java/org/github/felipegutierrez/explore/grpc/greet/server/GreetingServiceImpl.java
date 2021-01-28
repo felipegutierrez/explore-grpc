@@ -5,6 +5,7 @@ import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.greet.*;
 
 import java.util.Random;
+import java.util.stream.Stream;
 
 public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
     @Override
@@ -30,27 +31,25 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
 
     @Override
     public void greetManyTimes(GreetManyTimesRequest request, StreamObserver<GreetManyTimesResponse> responseObserver) {
-        try {
-            // extract necessary fields
-            Greeting greeting = request.getGreeting();
+        // extract necessary fields
+        Greeting greeting = request.getGreeting();
+        int times = request.getTimes();
 
-            for (int i = 0; i < 10; i++) {
-                // create the response
-                String result = "Hello " + greeting.getFirstName() + " " + greeting.getLastName() + ". Welcome to gRPC! response number[" + i + "]";
-                GreetManyTimesResponse response = GreetManyTimesResponse.newBuilder()
-                        .setResult(result)
-                        .build();
-
-                // send the response
-                responseObserver.onNext(response);
+        Stream.iterate(0, n -> n + 1).limit(times).forEach(n -> {
+            String result = "Hello " + greeting.getFirstName() + " " + greeting.getLastName() + ". Welcome to gRPC! response number[" + n + "]";
+            GreetManyTimesResponse response = GreetManyTimesResponse.newBuilder()
+                    .setResult(result)
+                    .build();
+            // send the response
+            responseObserver.onNext(response);
+            try {
                 Thread.sleep(500L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
-        } finally {
-            // complete the gRPC call
-            responseObserver.onCompleted();
-        }
+        });
+        // complete the gRPC call
+        responseObserver.onCompleted();
     }
 
     @Override
@@ -76,6 +75,7 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
                         .setResult(state)
                         .build();
                 responseObserver.onNext(response);
+                responseObserver.onCompleted();
             }
         };
         return requestObserver;

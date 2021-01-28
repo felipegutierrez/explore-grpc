@@ -25,6 +25,7 @@ message GreetResponse {
 
 message GreetManyTimesRequest {
   Greeting greeting = 1;
+  int32 times = 2;
 }
 message GreetManyTimesResponse {
   string result = 1;

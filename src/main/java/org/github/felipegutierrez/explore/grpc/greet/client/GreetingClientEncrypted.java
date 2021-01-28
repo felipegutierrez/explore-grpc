@@ -4,6 +4,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import org.github.felipegutierrez.explore.grpc.greet.*;
+import org.github.felipegutierrez.explore.grpc.util.Pair;
 
 import javax.net.ssl.SSLException;
 import java.io.File;

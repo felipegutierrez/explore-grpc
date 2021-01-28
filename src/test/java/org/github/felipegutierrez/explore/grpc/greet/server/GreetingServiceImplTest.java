@@ -3,6 +3,7 @@ package org.github.felipegutierrez.explore.grpc.greet.server;
 import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcServerRule;
 import org.github.felipegutierrez.explore.grpc.greet.*;
+import org.github.felipegutierrez.explore.grpc.util.Pair;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
-public class GreetingServerTest {
+public class GreetingServiceImplTest {
     @Rule
     public final GrpcServerRule grpcServerRule = new GrpcServerRule().directExecutor();
 
@@ -45,6 +46,97 @@ public class GreetingServerTest {
     }
 
     @Test
+    public void greeterUnaryCallManyTimes() {
+        // Add the service to the in-process server.
+        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
+
+        GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
+
+        String firstName = "Felipe";
+        String lastName = "Gutierrez";
+        // create the protocol buffer message Greeting
+        Greeting greeting = Greeting.newBuilder()
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .build();
+
+        // create a greeting request with the protocol buffer greeting message
+        GreetManyTimesRequest request = GreetManyTimesRequest.newBuilder()
+                .setGreeting(greeting)
+                .setTimes(10)
+                .build();
+
+        // call the gRPC and get back a protocol buffer GreetingResponse
+        List<String> result = new ArrayList<String>();
+        blockingStub.greetManyTimes(request)
+                .forEachRemaining(greetResponse -> {
+                    result.add(greetResponse.getResult());
+                });
+        assertTrue(result.size() == 10);
+        result.forEach(r -> {
+            assertTrue(r.contains("Hello " + firstName + " " + lastName));
+        });
+    }
+
+    @Test
+    public void greeterStreamClientCall() {
+        List<Pair<String, String>> people = Arrays.asList(
+                new Pair("Michael", "Jordan"),
+                new Pair("Oscar", "Wilde"),
+                new Pair("Madonna", "Monalisa")
+        );
+        StringBuilder expected = new StringBuilder();
+        people.forEach(p -> expected.append("Hello " + p.x + " " + p.y + "! "));
+        StringBuilder result = new StringBuilder();
+
+        // Add the service to the in-process server.
+        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
+        GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(grpcServerRule.getChannel());
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<LongGreetRequest> requestObserver = asyncClient.longGreet(new StreamObserver<LongGreetResponse>() {
+            @Override
+            public void onNext(LongGreetResponse value) {
+                System.out.println(value.getResult());
+                result.append(value.getResult());
+            }
+
+            @Override
+            public void onError(Throwable t) { latch.countDown(); }
+            @Override
+            public void onCompleted() { latch.countDown(); }
+        });
+
+        people.forEach(person -> {
+                    // create the protocol buffer message Greeting
+                    Greeting greeting = Greeting.newBuilder()
+                            .setFirstName(person.x)
+                            .setLastName(person.y)
+                            .build();
+                    LongGreetRequest request = LongGreetRequest.newBuilder()
+                            .setGreeting(greeting)
+                            .build();
+                    requestObserver.onNext(request);
+                    try {
+                        // simulate some computation to check asynchronous behaviour
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+        // we tell the server that the client is done sending data
+        requestObserver.onCompleted();
+
+        try {
+            latch.await(3L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertEquals(expected.toString(), result.toString());
+    }
+
+    @Test
     public void greeterStreamBiDirectionalCall() {
         List<Pair<String, String>> people = Arrays.asList(
                 new Pair("Felipe", "Gutierrez"),
@@ -54,8 +146,6 @@ public class GreetingServerTest {
 
         // Add the service to the in-process server.
         grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
-
-        // GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
         GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(grpcServerRule.getChannel());
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -110,24 +200,4 @@ public class GreetingServerTest {
             assertTrue(response.contains("Hello " + p.x + " " + p.y));
         });
     }
-
-    class Pair<S, T> {
-        public final S x;
-        public final T y;
-
-        public Pair(S x, T y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public String toString() {
-            return "Pair{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    '}';
-        }
-    }
 }
-
-
