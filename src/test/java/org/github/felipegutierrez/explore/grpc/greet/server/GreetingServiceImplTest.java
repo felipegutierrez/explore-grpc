@@ -7,6 +7,7 @@ import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcServerRule;
 import org.github.felipegutierrez.explore.grpc.greet.*;
 import org.github.felipegutierrez.explore.grpc.util.Pair;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,11 +27,14 @@ public class GreetingServiceImplTest {
     @Rule
     public final GrpcServerRule grpcServerRule = new GrpcServerRule().directExecutor();
 
-    @Test
-    public void greeterUnaryCall() {
+    @Before
+    public void addService() {
         // Add the service to the in-process server.
         grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
+    }
 
+    @Test
+    public void greeterUnaryCall() {
         GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
 
         String firstName = "Felipe";
@@ -50,9 +54,6 @@ public class GreetingServiceImplTest {
 
     @Test
     public void greeterUnaryCallManyTimes() {
-        // Add the service to the in-process server.
-        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
-
         GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
 
         String firstName = "Felipe";
@@ -92,8 +93,6 @@ public class GreetingServiceImplTest {
         people.forEach(p -> expected.append("Hello " + p.x + " " + p.y + "! "));
         StringBuilder result = new StringBuilder();
 
-        // Add the service to the in-process server.
-        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
         GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(grpcServerRule.getChannel());
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -152,8 +151,6 @@ public class GreetingServiceImplTest {
         );
         List<String> response = new ArrayList<String>();
 
-        // Add the service to the in-process server.
-        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
         GreetServiceGrpc.GreetServiceStub asyncClient = GreetServiceGrpc.newStub(grpcServerRule.getChannel());
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -209,14 +206,51 @@ public class GreetingServiceImplTest {
         });
     }
 
-    // @Test
-    public void greeterUnaryCallWithDeadline() {
+    @Test
+    public void greeterUnaryCallWithLargeDeadline() {
+        List<Pair<String, String>> people = Arrays.asList(
+                new Pair("Felipe", "Gutierrez"),
+                new Pair("Simone", "Farias"),
+                new Pair("Michael", "Jordan"),
+                new Pair("Oscar", "Wilde"),
+                new Pair("Madonna", "Monalisa")
+        );
+        List<Status.Code> listOfCodes = new ArrayList<Status.Code>();
+        GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
+
+        people.forEach(person -> {
+            try {
+                // create the protocol buffer message Greeting
+                Greeting greeting = Greeting.newBuilder()
+                        .setFirstName(person.x)
+                        .setLastName(person.y)
+                        .build();
+                // create a greeting request with the protocol buffer greeting message
+                GreetWithDeadlineRequest request = GreetWithDeadlineRequest.newBuilder()
+                        .setGreeting(greeting)
+                        .build();
+                System.out.println("Sending message: " + greeting.toString());
+                // call the gRPC and get back a protocol buffer GreetingResponse
+                GreetWithDeadlineResponse greetResponse = blockingStub
+                        .withDeadline(Deadline.after(5, TimeUnit.SECONDS))
+                        .greetWithDeadline(request);
+                System.out.println("Hello from server with deadline: " + greetResponse.getResult());
+            } catch (StatusRuntimeException e) {
+                listOfCodes.add(e.getStatus().getCode());
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        assertEquals(0, listOfCodes.size());
+    }
+
+    // @Test // not working. it is hanging forever
+    public void greeterUnaryCallWithSmallDeadline() {
         List<Pair<String, String>> people = Arrays.asList(
                 new Pair("Felipe", "Gutierrez")
         );
         List<Status.Code> listOfCodes = new ArrayList<Status.Code>();
-        // Add the service to the in-process server.
-        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
         GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
 
         people.forEach(person -> {
@@ -243,6 +277,7 @@ public class GreetingServiceImplTest {
                 e.printStackTrace();
             }
         });
+        System.out.println(listOfCodes.size());
         assertEquals(1, listOfCodes.size());
         listOfCodes.forEach(code -> {
             assertEquals(code, Status.Code.DEADLINE_EXCEEDED);

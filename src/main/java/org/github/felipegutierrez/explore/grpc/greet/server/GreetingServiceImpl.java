@@ -4,7 +4,6 @@ import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import org.github.felipegutierrez.explore.grpc.greet.*;
 
-import java.util.Random;
 import java.util.stream.Stream;
 
 public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
@@ -111,27 +110,29 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
         try {
             Context context = Context.current();
 
-            Random random = new Random();
-            long time = (random.nextInt(5)) * 100;
-            System.out.println("taking " + time + " milliseconds to process...");
-            Thread.sleep(time);
+            System.out.println("taking 300 milliseconds to process...");
+            Thread.sleep(300);
 
             // if the time reaches the upper bound dead line we return the gRPC call
             if (context.isCancelled()) {
                 System.out.println("context.isCancelled()");
+                responseObserver.onCompleted(); // I tested with and without this line
                 return;
             }
 
-            String result = "Hello " + request.getGreeting().getFirstName() + " " + request.getGreeting().getLastName() + " after " + time + " milliseconds.";
+            String result = "Hello " + request.getGreeting().getFirstName() + " " + request.getGreeting().getLastName() + " after 300 milliseconds.";
             GreetWithDeadlineResponse response = GreetWithDeadlineResponse.newBuilder()
                     .setResult(result)
                     .build();
             responseObserver.onNext(response);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            // dont forget to complete the call and send message back to the client!!!
+            // don't forget to complete the call and send message back to the client!!!
             responseObserver.onCompleted();
+        } catch (InterruptedException e) {
+            responseObserver.onCompleted(); // I tested with and without this line
+            e.printStackTrace();
+        } catch (Exception e) {
+            responseObserver.onCompleted(); // I tested with and without this line
+            e.printStackTrace();
         }
     }
 }
