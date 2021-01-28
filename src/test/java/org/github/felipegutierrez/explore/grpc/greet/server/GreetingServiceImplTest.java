@@ -1,5 +1,8 @@
 package org.github.felipegutierrez.explore.grpc.greet.server;
 
+import io.grpc.Deadline;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcServerRule;
 import org.github.felipegutierrez.explore.grpc.greet.*;
@@ -102,9 +105,14 @@ public class GreetingServiceImplTest {
             }
 
             @Override
-            public void onError(Throwable t) { latch.countDown(); }
+            public void onError(Throwable t) {
+                latch.countDown();
+            }
+
             @Override
-            public void onCompleted() { latch.countDown(); }
+            public void onCompleted() {
+                latch.countDown();
+            }
         });
 
         people.forEach(person -> {
@@ -198,6 +206,46 @@ public class GreetingServiceImplTest {
 
         people.forEach(p -> {
             assertTrue(response.contains("Hello " + p.x + " " + p.y));
+        });
+    }
+
+    // @Test
+    public void greeterUnaryCallWithDeadline() {
+        List<Pair<String, String>> people = Arrays.asList(
+                new Pair("Felipe", "Gutierrez")
+        );
+        List<Status.Code> listOfCodes = new ArrayList<Status.Code>();
+        // Add the service to the in-process server.
+        grpcServerRule.getServiceRegistry().addService(new GreetingServiceImpl());
+        GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
+
+        people.forEach(person -> {
+            try {
+                // create the protocol buffer message Greeting
+                Greeting greeting = Greeting.newBuilder()
+                        .setFirstName(person.x)
+                        .setLastName(person.y)
+                        .build();
+                // create a greeting request with the protocol buffer greeting message
+                GreetWithDeadlineRequest request = GreetWithDeadlineRequest.newBuilder()
+                        .setGreeting(greeting)
+                        .build();
+                System.out.println("Sending message: " + greeting.toString());
+                // call the gRPC and get back a protocol buffer GreetingResponse
+                GreetWithDeadlineResponse greetResponse = blockingStub
+                        .withDeadline(Deadline.after(1, TimeUnit.MILLISECONDS))
+                        .greetWithDeadline(request);
+                System.out.println("Hello from server with deadline: " + greetResponse.getResult());
+            } catch (StatusRuntimeException e) {
+                listOfCodes.add(e.getStatus().getCode());
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        assertEquals(1, listOfCodes.size());
+        listOfCodes.forEach(code -> {
+            assertEquals(code, Status.Code.DEADLINE_EXCEEDED);
         });
     }
 }

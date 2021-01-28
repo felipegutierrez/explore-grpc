@@ -127,10 +127,11 @@ public class GreetingServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
                     .setResult(result)
                     .build();
             responseObserver.onNext(response);
-            // dont forget to complete the call and send message back to the client!!!
-            responseObserver.onCompleted();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            // dont forget to complete the call and send message back to the client!!!
+            responseObserver.onCompleted();
         }
     }
 }

@@ -30,11 +30,11 @@ public class GreetingClient {
         GreetingClient client = new GreetingClient();
 
         client.createChannel();
-        // client.runUnaryGrpc();
-        // client.runStreamServerGrpc();
+        client.runUnaryGrpc();
+        client.runStreamServerGrpc();
         client.runStreamClientGrpc();
-        // client.runStreamBiDirectionalGrpc();
-        // client.runUnaryWithDeadlineGrpc();
+        client.runStreamBiDirectionalGrpc();
+        client.runUnaryWithDeadlineGrpc();
         client.closeChannel();
     }
 
