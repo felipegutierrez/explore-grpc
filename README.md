@@ -1,4 +1,5 @@
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e7ed92bb488640b686f77fd8db0b898c)](https://app.codacy.com/gh/felipegutierrez/explore-grpc?utm_source=github.com&utm_medium=referral&utm_content=felipegutierrez/explore-grpc&utm_campaign=Badge_Grade)
 [![Build Status](https://www.travis-ci.com/felipegutierrez/explore-grpc.svg?branch=main)](https://www.travis-ci.com/felipegutierrez/explore-grpc)
 [![codecov](https://codecov.io/gh/felipegutierrez/explore-grpc/branch/main/graph/badge.svg?token=49Y55XPCCT)](https://codecov.io/gh/felipegutierrez/explore-grpc)
 [![CodeFactor](https://www.codefactor.io/repository/github/felipegutierrez/explore-grpc/badge)](https://www.codefactor.io/repository/github/felipegutierrez/explore-grpc)
